@@ -30,9 +30,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  rj_form_engine:
-    path: E:/ODCL_Projects/Personal_Test_Project/publication/rj_form_engine
+  # rj_form_engine:
+  #   path: E:/ODCL_Projects/Personal_Test_Project/publication/rj_form_engine
   cupertino_icons: ^1.0.8
+  rj_form_engine: ^0.2.0
 
 dev_dependencies:
   flutter_test:
