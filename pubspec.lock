@@ -291,10 +291,10 @@ packages:
   rj_form_engine:
     dependency: "direct main"
     description:
-      path: "E:\\ODCL_Projects\\Personal_Test_Project\\publication\\rj_form_engine"
+      path: "E:/ODCL_Projects/Personal_Test_Project/publication/rj_form_engine"
       relative: false
     source: path
-    version: "0.0.1"
+    version: "0.2.0"
   sky_engine:
     dependency: transitive
     description: flutter

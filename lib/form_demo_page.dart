@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:rj_form_engine/rj_form_engine.dart';
 import 'package:rj_form_engine_tests_project/main.dart';
 import 'package:rj_form_engine_tests_project/phone_number.dart';
+import 'package:rj_form_engine_tests_project/theme/app_theme.dart';
 
 class FormDemoPage extends StatefulWidget {
-  const FormDemoPage({super.key});
+  final VoidCallback onToggleTheme;
+  final ThemeMode themeMode;
+
+  const FormDemoPage({super.key, required this.onToggleTheme, required this.themeMode});
 
   @override
   State<FormDemoPage> createState() => _FormDemoPageState();
@@ -12,6 +16,8 @@ class FormDemoPage extends StatefulWidget {
 
 class _FormDemoPageState extends State<FormDemoPage> {
   late final FormController controller;
+  final _scrollKey = GlobalKey<ScaffoldState>();
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -19,9 +25,11 @@ class _FormDemoPageState extends State<FormDemoPage> {
     controller = FormController();
   }
 
-  // ------------------------------
-  // Mock APIs — updated to new DropdownLoader signature
-  // ------------------------------
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   Future<List<DropdownItem>> fetchCountries({String? parentValue}) async {
     await Future.delayed(const Duration(milliseconds: 500));
@@ -30,7 +38,6 @@ class _FormDemoPageState extends State<FormDemoPage> {
 
   Future<List<DropdownItem>> fetchCities({String? parentValue}) async {
     await Future.delayed(const Duration(milliseconds: 500));
-
     if (parentValue == 'bd') {
       return [DropdownItem(id: 'dhaka', label: 'Dhaka'), DropdownItem(id: 'ctg', label: 'Chattogram'), DropdownItem(id: 'sylhet', label: 'Sylhet')];
     } else if (parentValue == 'us') {
@@ -43,37 +50,25 @@ class _FormDemoPageState extends State<FormDemoPage> {
     return [];
   }
 
-  // ------------------------------
-  // Fields — ALL 13 built-in types + custom + section
-  // ------------------------------
   List<FieldMeta> get fields => [
-    // Sections now require explicit key
-    FieldMeta.section(key: 'sec_personal', label: 'Personal Info'),
-
+    FieldMeta.section(key: 'sec_personal', label: 'Personal Information'),
     FieldMeta(key: 'full_name', label: 'Full Name', type: FieldType.text, required: true, hint: 'Enter your full name', validators: [RjValidators.required(), RjValidators.minLength(2)]),
-
     FieldMeta(key: 'email', label: 'Email Address', type: FieldType.text, required: true, hint: 'you@example.com', validators: [RjValidators.required(), RjValidators.email()]),
-
     FieldMeta(
       key: 'password',
       label: 'Password',
       type: FieldType.text,
       required: true,
       obscureText: true,
-      hint: 'Enter your password',
+      hint: 'Min 8 characters',
       validators: [RjValidators.required(), RjValidators.minLength(8), RjValidators.hasUppercase(), RjValidators.hasDigit()],
     ),
-
     FieldMeta(key: 'bio', label: 'Bio', type: FieldType.textArea, hint: 'Tell us about yourself...', maxLines: 4, validators: [RjValidators.maxLength(500)]),
-
     FieldMeta(key: 'age', label: 'Age', type: FieldType.number, required: true, hint: 'Enter your age', validators: [RjValidators.required(), RjValidators.between(1, 150)]),
-
     FieldMeta(key: 'dob', label: 'Date of Birth', type: FieldType.date, required: true, firstDate: DateTime(1900), lastDate: DateTime.now(), hint: 'Select your date of birth'),
-
     FieldMeta.section(key: 'sec_scheduling', label: 'Scheduling'),
-
     FieldMeta(key: 'preferred_time', label: 'Preferred Meeting Time', type: FieldType.timePicker, required: true, hint: 'Select a time'),
-
+    FieldMeta.section(key: 'sec_preferences', label: 'Preferences'),
     FieldMeta(
       key: 'gender',
       label: 'Gender',
@@ -86,26 +81,18 @@ class _FormDemoPageState extends State<FormDemoPage> {
         DropdownItem(id: 'prefer_not', label: 'Prefer not to say'),
       ]),
     ),
-
     FieldMeta(key: 'country', label: 'Country', type: FieldType.dropdown, required: true, hint: 'Select your country', dropdownSource: DropdownSource.async(fetchCountries)),
-
     FieldMeta(
       key: 'city',
       label: 'City',
       type: FieldType.dropdown,
       required: true,
-      // Removed flat dependsOn — only dependency now
       dependency: FieldDependency(dependsOn: 'country', condition: (val) => val != null),
       hint: 'Select your city',
       dropdownSource: DropdownSource.async(fetchCities),
     ),
-
-    FieldMeta.section(key: 'sec_preferences', label: 'Preferences'),
-
     FieldMeta(key: 'newsletter', label: 'Subscribe to Newsletter', type: FieldType.toggle, hint: 'Get weekly updates and news'),
-
     FieldMeta(key: 'accept_terms', label: 'Accept Terms & Conditions', type: FieldType.toggle, required: true, hint: 'You must accept to continue'),
-
     FieldMeta(
       key: 'experience_level',
       label: 'Experience Level',
@@ -118,7 +105,6 @@ class _FormDemoPageState extends State<FormDemoPage> {
         DropdownItem(id: 'expert', label: 'Expert', sublabel: '5+ years'),
       ],
     ),
-
     FieldMeta(
       key: 'skills',
       label: 'Skills',
@@ -136,9 +122,7 @@ class _FormDemoPageState extends State<FormDemoPage> {
         DropdownItem(id: 'aws', label: 'AWS'),
       ],
     ),
-
     FieldMeta.section(key: 'sec_ratings', label: 'Ratings & Quantities'),
-
     FieldMeta(
       key: 'satisfaction',
       label: 'Satisfaction Score',
@@ -149,18 +133,11 @@ class _FormDemoPageState extends State<FormDemoPage> {
       sliderDivisions: 100,
       sliderLabelBuilder: (val) => '${val.round()}%',
     ),
-
     FieldMeta(key: 'volume', label: 'Volume Level', type: FieldType.slider, sliderMin: 0, sliderMax: 10, sliderDivisions: 10, sliderLabelBuilder: (val) => '${val.round()}'),
-
     FieldMeta(key: 'quantity', label: 'Quantity', type: FieldType.spinner, required: true, spinnerMin: 1, spinnerMax: 99, spinnerStep: 1),
-
     FieldMeta(key: 'years_experience', label: 'Years of Experience', type: FieldType.spinner, spinnerMin: 0, spinnerMax: 50, spinnerStep: 5),
-
     FieldMeta.section(key: 'sec_media', label: 'Media & Custom'),
-
     FieldMeta(key: 'profile_images', label: 'Profile Images', type: FieldType.image, maxImages: 5, hint: 'Upload up to 5 images'),
-
-    // CustomFieldBuilder now receives `field` as 2nd param
     FieldMeta.custom(
       key: 'phone',
       label: 'Phone Number',
@@ -168,28 +145,55 @@ class _FormDemoPageState extends State<FormDemoPage> {
       validators: [PhoneValidators.byCountry()],
       builder: (context, field, value, onChanged, errorText) {
         final phone = value as PhoneNumber? ?? PhoneNumber(countryCode: '+880', number: '');
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '${field.label}${field.required ? ' *' : ''}',
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF374151)),
+            Row(
+              children: [
+                Text(
+                  '${field.label}${field.required ? ' *' : ''}',
+                  style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600, color: isDark ? AppTheme.darkTextPrimary : AppTheme.lightTextPrimary),
+                ),
+              ],
             ),
-            if (field.hint != null) Text(field.hint!, style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF))),
+            if (field.hint != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(field.hint!, style: theme.textTheme.bodySmall?.copyWith(color: isDark ? AppTheme.darkTextHint : AppTheme.lightTextHint)),
+              ),
             const SizedBox(height: 8),
             Row(
               children: [
-                DropdownButton<String>(
-                  value: phone.countryCode,
-                  items: PhoneValidators.countryCodes.map((code) {
-                    return DropdownMenuItem(value: code, child: Text(code));
-                  }).toList(),
-                  onChanged: (code) {
-                    if (code != null) {
-                      onChanged(PhoneNumber(countryCode: code, number: phone.number));
-                    }
-                  },
+                Container(
+                  decoration: BoxDecoration(
+                    color: isDark ? AppTheme.darkFieldFill : AppTheme.lightFieldFill,
+                    border: Border.all(
+                      color: errorText != null
+                          ? AppTheme.errorColor
+                          : isDark
+                          ? AppTheme.darkBorder
+                          : AppTheme.lightBorder,
+                      width: AppTheme.borderWidth,
+                    ),
+                    borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: phone.countryCode,
+                      items: PhoneValidators.countryCodes.map((code) {
+                        return DropdownMenuItem(value: code, child: Text(code));
+                      }).toList(),
+                      onChanged: (code) {
+                        if (code != null) {
+                          onChanged(PhoneNumber(countryCode: code, number: phone.number));
+                        }
+                      },
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -198,7 +202,7 @@ class _FormDemoPageState extends State<FormDemoPage> {
                     decoration: InputDecoration(
                       hintText: 'Enter phone number',
                       errorText: errorText,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppTheme.borderRadius)),
                     ),
                     onChanged: (val) {
                       onChanged(PhoneNumber(countryCode: phone.countryCode, number: val));
@@ -211,7 +215,6 @@ class _FormDemoPageState extends State<FormDemoPage> {
         );
       },
     ),
-
     FieldMeta.custom(
       key: 'rating',
       label: 'Rate Your Experience',
@@ -219,33 +222,65 @@ class _FormDemoPageState extends State<FormDemoPage> {
       validators: [(v) => (v == null || v == 0) ? 'Please rate your experience' : null],
       builder: (context, field, value, onChanged, errorText) {
         final rating = value as int? ?? 0;
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '${field.label}${field.required ? ' *' : ''}',
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF374151)),
+            Row(
+              children: [
+                Text(
+                  '${field.label}${field.required ? ' *' : ''}',
+                  style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600, color: isDark ? AppTheme.darkTextPrimary : AppTheme.lightTextPrimary),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
             Row(
               children: List.generate(5, (i) {
-                return IconButton(
-                  icon: Icon(i < rating ? Icons.star : Icons.star_border, color: Colors.amber, size: 36),
-                  onPressed: () => onChanged(i + 1),
+                return TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 200),
+                  tween: Tween(begin: 1.0, end: i < rating ? 1.2 : 1.0),
+                  builder: (context, scale, child) {
+                    return Transform.scale(
+                      scale: scale,
+                      child: IconButton(
+                        icon: Icon(
+                          i < rating ? Icons.star_rounded : Icons.star_border_rounded,
+                          color: i < rating ? AppTheme.accentColor : (isDark ? AppTheme.darkTextHint : AppTheme.lightTextHint),
+                          size: 40,
+                        ),
+                        onPressed: () => onChanged(i + 1),
+                      ),
+                    );
+                  },
                 );
               }),
             ),
+            if (rating > 0)
+              Padding(
+                padding: const EdgeInsets.only(left: 12, bottom: 4),
+                child: Text(
+                  rating <= 2
+                      ? 'Poor'
+                      : rating == 3
+                      ? 'Average'
+                      : rating == 4
+                      ? 'Good'
+                      : 'Excellent',
+                  style: theme.textTheme.bodySmall?.copyWith(color: rating <= 2 ? AppTheme.errorColor : AppTheme.successColor, fontWeight: FontWeight.w500),
+                ),
+              ),
             if (errorText != null)
               Padding(
                 padding: const EdgeInsets.only(top: 6, left: 4),
-                child: Text(errorText, style: const TextStyle(color: Color(0xFFDC2626), fontSize: 12)),
+                child: Text(errorText, style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.errorColor)),
               ),
           ],
         );
       },
     ),
-
     FieldMeta.custom(
       key: 'feedback',
       label: 'Feedback',
@@ -255,32 +290,144 @@ class _FormDemoPageState extends State<FormDemoPage> {
           decoration: InputDecoration(
             labelText: 'Tell us what went wrong',
             errorText: errorText,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppTheme.borderRadius)),
           ),
           maxLines: 3,
           onChanged: onChanged,
         );
       },
     ),
+    FieldMeta.custom(
+      key: 'color_preference',
+      label: 'Favorite Color',
+      builder: (context, field, value, onChanged, errorText) {
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
+        final selectedColor = value as Color?;
 
+        final colors = [Colors.red, Colors.orange, Colors.amber, Colors.green, Colors.teal, Colors.blue, Colors.indigo, Colors.purple, Colors.pink, Colors.brown];
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  '${field.label}${field.required ? ' *' : ''}',
+                  style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600, color: isDark ? AppTheme.darkTextPrimary : AppTheme.lightTextPrimary),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: colors.map((color) {
+                final isSelected = selectedColor == color;
+                return GestureDetector(
+                  onTap: () => onChanged(isSelected ? null : color),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: isSelected ? (isDark ? AppTheme.darkTextPrimary : AppTheme.lightTextPrimary) : Colors.transparent, width: 2.5),
+                      boxShadow: isSelected ? [BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 8, spreadRadius: 2)] : null,
+                    ),
+                    child: isSelected ? Icon(Icons.check_rounded, color: color.computeLuminance() > 0.5 ? Colors.black : Colors.white, size: 24) : null,
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        );
+      },
+    ),
+    FieldMeta.custom(
+      key: 'tags',
+      label: 'Tags',
+      builder: (context, field, value, onChanged, errorText) {
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
+        final tags = value is List<String> ? value : <String>[];
+        final controller = TextEditingController();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  '${field.label}${field.required ? ' *' : ''}',
+                  style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600, color: isDark ? AppTheme.darkTextPrimary : AppTheme.lightTextPrimary),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ...tags.map(
+                  (tag) => Chip(
+                    label: Text(tag),
+                    deleteIcon: const Icon(Icons.close_rounded, size: 18),
+                    onDeleted: () {
+                      final newTags = List<String>.from(tags)..remove(tag);
+                      onChanged(newTags);
+                    },
+                  ),
+                ),
+                SizedBox(
+                  width: 120,
+                  child: TextField(
+                    controller: controller,
+                    decoration: InputDecoration(
+                      hintText: 'Add tag...',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppTheme.borderRadiusSm)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      isDense: true,
+                    ),
+                    onSubmitted: (val) {
+                      if (val.trim().isNotEmpty) {
+                        final newTags = List<String>.from(tags)..add(val.trim());
+                        onChanged(newTags);
+                        controller.clear();
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    ),
     FieldMeta.custom(
       key: 'app_version',
       label: 'App Version',
       builder: (context, field, value, onChanged, errorText) {
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
+
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFFF3F4F6),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFFD1D5DB), width: 1.5),
+            color: isDark ? AppTheme.darkSurfaceVariant : AppTheme.lightSurfaceVariant,
+            borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+            border: Border.all(color: isDark ? AppTheme.darkBorder : AppTheme.lightBorder, width: 1),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info_outline, color: Color(0xFF6B7280)),
-              SizedBox(width: 12),
-              Text(
-                'Version 1.0.0',
-                style: TextStyle(fontSize: 14, color: Color(0xFF374151), fontWeight: FontWeight.w500),
+              Icon(Icons.info_outline_rounded, color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Version 1.0.0 • Build 2026.04.06',
+                  style: theme.textTheme.bodyMedium?.copyWith(color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary, fontWeight: FontWeight.w500),
+                ),
               ),
             ],
           ),
@@ -289,12 +436,9 @@ class _FormDemoPageState extends State<FormDemoPage> {
     ),
   ];
 
-  // ------------------------------
-  // Submit handler
-  // ------------------------------
-  Future<void> _handleSubmit(FormResult result) async {
-    debugPrint('FORM RESULT: ${result.values}');
-  }
+  // Future<void> _handleSubmit(FormResult result) async {
+  //   debugPrint('FORM RESULT: ${result.values}');
+  // }
 
   void _onSuccess(FormResult result) {
     _showResultDialog(result.values);
@@ -305,7 +449,13 @@ class _FormDemoPageState extends State<FormDemoPage> {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          title: const Text('Form Submitted'),
+          title: const Row(
+            children: [
+              Icon(Icons.check_circle_rounded, color: AppTheme.successColor),
+              SizedBox(width: 8),
+              Text('Form Submitted'),
+            ],
+          ),
           content: SizedBox(
             width: double.maxFinite,
             child: SingleChildScrollView(
@@ -318,16 +468,20 @@ class _FormDemoPageState extends State<FormDemoPage> {
                   final display = _formatValue(f, val);
                   return [
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            flex: 2,
-                            child: Text(f.label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                          Text(
+                            f.label,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Theme.of(context).brightness == Brightness.dark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
+                            ),
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(flex: 3, child: Text(display, style: const TextStyle(fontSize: 13))),
+                          const SizedBox(height: 2),
+                          Text(display, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
                         ],
                       ),
                     ),
@@ -336,7 +490,7 @@ class _FormDemoPageState extends State<FormDemoPage> {
               ),
             ),
           ),
-          actions: [TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('OK'))],
+          actions: [TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Close'))],
         );
       },
     );
@@ -358,49 +512,114 @@ class _FormDemoPageState extends State<FormDemoPage> {
     if (val is PhoneNumber) {
       return '${val.countryCode} ${val.number}';
     }
+    if (val is Color) {
+      return '#${val.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
+    }
     return val.toString();
   }
 
-  // ------------------------------
-  // UI
-  // ------------------------------
-
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      key: _scrollKey,
       appBar: AppBar(
-        title: const Text('RJ Form Engine — All Fields'),
+        title: const Text('Form Engine Demo'),
+        leading: IconButton(icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded), onPressed: widget.onToggleTheme, tooltip: 'Toggle theme'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
             onPressed: () {
               controller.clear();
               setState(() {});
+              messengerKey.currentState?.showSnackBar(const SnackBar(content: Text('Form reset'), duration: Duration(seconds: 1)));
             },
             tooltip: 'Reset Form',
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: RjForm(controller: controller, fields: fields, onSubmit: _handleSubmit, onSuccess: _onSuccess, autoClearOnSubmit: true),
-        ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+              child: RjForm(
+                controller: controller,
+                fields: fields,
+                // onSubmit: _handleSubmit,
+                onSuccess: _onSuccess,
+                autoClearOnSubmit: true,
+                theme: RjFormTheme(
+                  primaryColor: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
+                  borderColor: isDark ? AppTheme.darkBorder : AppTheme.lightBorder,
+                  errorColor: AppTheme.errorColor,
+                  focusedBorderColor: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
+                  fieldFillColor: isDark ? AppTheme.darkFieldFill : AppTheme.lightFieldFill,
+                  borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                  fieldSpacing: AppTheme.fieldSpacing,
+                  borderWidth: AppTheme.borderWidth,
+                  contentPadding: AppTheme.contentPadding,
+                  submitButtonColor: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          if (controller.validate(fields)) {
-            final result = controller.toResult();
-            debugPrint('MANUAL SUBMIT: ${result.values}');
-            _showResultDialog(result.values);
-            controller.clear();
-            setState(() {});
-          } else {
-            messengerKey.currentState?.showSnackBar(const SnackBar(content: Text('Please fix validation errors'), backgroundColor: Colors.red));
-          }
-        },
-        label: const Text('Submit'),
-        icon: const Icon(Icons.send),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? AppTheme.darkSurface : AppTheme.lightSurface,
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -2))],
+        ),
+        child: SafeArea(
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    controller.clear();
+                    setState(() {});
+                  },
+                  icon: const Icon(Icons.clear_rounded),
+                  label: const Text('Clear'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.borderRadius)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                flex: 2,
+                child: FilledButton.icon(
+                  onPressed: _isSubmitting
+                      ? null
+                      : () async {
+                          setState(() => _isSubmitting = true);
+                          if (controller.validate(fields)) {
+                            final result = controller.toResult();
+                            debugPrint('MANUAL SUBMIT: ${result.values}');
+                            _showResultDialog(result.values);
+                            controller.clear();
+                            setState(() {});
+                          } else {
+                            messengerKey.currentState?.showSnackBar(const SnackBar(content: Text('Please fix validation errors'), backgroundColor: AppTheme.errorColor));
+                          }
+                          setState(() => _isSubmitting = false);
+                        },
+                  icon: _isSubmitting ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.send_rounded),
+                  label: Text(_isSubmitting ? 'Submitting...' : 'Submit Form'),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.borderRadius)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
