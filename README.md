@@ -5,7 +5,6 @@ RjFormEngine in real forms. This project demonstrates default and custom
 fields, theming, validation, cascading dropdowns, date/time fields, and
 more — all wired via schema-driven FieldMeta definitions.
 
-Key package used: `rj_form_engine` (local path in pubspec.yaml).
 ---
 
 
