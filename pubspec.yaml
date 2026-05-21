@@ -31,8 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  rj_form_engine:
-    path: ../rj_form_engine
+  rj_form_engine: ^0.3.0
+  # path: ../rj_form_engine
 
 dev_dependencies:
   flutter_test:
