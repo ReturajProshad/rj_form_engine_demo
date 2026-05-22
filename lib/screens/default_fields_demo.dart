@@ -36,26 +36,27 @@ class _DefaultFieldsDemoState extends State<DefaultFieldsDemo> {
 
   List<FieldMeta> get fields => [
     FieldMeta.section(key: 'sec_account', label: 'Account'),
-    FieldMeta(
+    // Full Name + Email — side by side on tablet+
+    FieldMeta.text(
       key: 'full_name',
       label: 'Full Name',
-      type: FieldType.text,
       required: true,
       hint: 'Enter your full name',
       validators: [RjValidators.required(), RjValidators.minLength(2)],
+      layout: const RjLayout(md: RjSpan.half),
     ),
-    FieldMeta(
+    FieldMeta.text(
       key: 'email',
       label: 'Email Address',
-      type: FieldType.text,
       required: true,
       hint: 'you@example.com',
       validators: [RjValidators.required(), RjValidators.email()],
+      layout: const RjLayout(md: RjSpan.half),
     ),
-    FieldMeta(
+    // Password — full width (security field, should stand alone)
+    FieldMeta.text(
       key: 'password',
       label: 'Password',
-      type: FieldType.text,
       required: true,
       obscureText: true,
       hint: 'Min 8 characters',
@@ -66,51 +67,53 @@ class _DefaultFieldsDemoState extends State<DefaultFieldsDemo> {
         RjValidators.hasDigit(),
       ],
     ),
-    FieldMeta(
+    // Bio — full width (textarea needs space)
+    FieldMeta.textArea(
       key: 'bio',
       label: 'Bio',
-      type: FieldType.textArea,
       hint: 'Tell us about yourself...',
       maxLines: 4,
       validators: [RjValidators.maxLength(500)],
     ),
     FieldMeta.section(key: 'sec_profile', label: 'Profile'),
-    FieldMeta(
+    // Age + DOB — side by side
+    FieldMeta.number(
       key: 'age',
       label: 'Age',
-      type: FieldType.number,
       required: true,
       hint: 'Enter your age',
       validators: [RjValidators.required(), RjValidators.between(1, 150)],
+      layout: const RjLayout(md: RjSpan.half),
     ),
-    FieldMeta(
+    FieldMeta.date(
       key: 'dob',
       label: 'Date of Birth',
-      type: FieldType.date,
       required: true,
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
       hint: 'Select your date of birth',
+      layout: const RjLayout(md: RjSpan.half),
     ),
-    FieldMeta(
+    // Preferred Time + Country — side by side
+    FieldMeta.timePicker(
       key: 'preferred_time',
       label: 'Preferred Time',
-      type: FieldType.timePicker,
       required: true,
       hint: 'Select a time',
+      layout: const RjLayout(md: RjSpan.half),
     ),
-    FieldMeta(
+    FieldMeta.dropdown(
       key: 'country',
       label: 'Country',
-      type: FieldType.dropdown,
       required: true,
       hint: 'Select your country',
       dropdownSource: DropdownSource.async(fetchCountries),
+      layout: const RjLayout(md: RjSpan.half),
     ),
-    FieldMeta(
+    // Gender — full width (radio options need horizontal space)
+    FieldMeta.radio(
       key: 'gender',
       label: 'Gender',
-      type: FieldType.radio,
       required: true,
       options: [
         DropdownItem(id: 'male', label: 'Male'),
@@ -120,16 +123,15 @@ class _DefaultFieldsDemoState extends State<DefaultFieldsDemo> {
       ],
     ),
     FieldMeta.section(key: 'sec_settings', label: 'Settings'),
-    FieldMeta(
+    FieldMeta.toggle(
       key: 'newsletter',
       label: 'Subscribe to Newsletter',
-      type: FieldType.toggle,
       hint: 'Get weekly updates',
     ),
-    FieldMeta(
+    // Skills + Satisfaction — side by side
+    FieldMeta.chip(
       key: 'skills',
       label: 'Skills',
-      type: FieldType.chip,
       required: true,
       hint: 'Select all that apply',
       options: [
@@ -139,40 +141,41 @@ class _DefaultFieldsDemoState extends State<DefaultFieldsDemo> {
         DropdownItem(id: 'rest_api', label: 'REST API'),
         DropdownItem(id: 'git', label: 'Git'),
       ],
+      layout: const RjLayout(md: RjSpan.half),
     ),
-    FieldMeta(
+    FieldMeta.slider(
       key: 'satisfaction',
       label: 'Satisfaction',
-      type: FieldType.slider,
       required: true,
       sliderMin: 0,
       sliderMax: 100,
       sliderDivisions: 100,
       sliderLabelBuilder: (val) => '${val.round()}%',
+      layout: const RjLayout(md: RjSpan.half),
     ),
-    FieldMeta(
+    // Volume + Quantity — side by side
+    FieldMeta.slider(
       key: 'volume',
       label: 'Volume',
-      type: FieldType.slider,
       sliderMin: 0,
       sliderMax: 10,
       sliderDivisions: 10,
       sliderLabelBuilder: (val) => '${val.round()}',
+      layout: const RjLayout(md: RjSpan.half),
     ),
-    FieldMeta(
+    FieldMeta.spinner(
       key: 'quantity',
       label: 'Quantity',
-      type: FieldType.spinner,
       required: true,
       spinnerMin: 1,
       spinnerMax: 99,
       spinnerStep: 1,
+      layout: const RjLayout(md: RjSpan.half),
     ),
     FieldMeta.section(key: 'sec_media', label: 'Media'),
-    FieldMeta(
+    FieldMeta.image(
       key: 'profile_images',
       label: 'Profile Images',
-      type: FieldType.image,
       maxImages: 5,
       hint: 'Upload up to 5 images',
     ),

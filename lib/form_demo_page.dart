@@ -52,27 +52,27 @@ class _FormDemoPageState extends State<FormDemoPage> {
 
   List<FieldMeta> get fields => [
     FieldMeta.section(key: 'sec_personal', label: 'Personal Information'),
-    FieldMeta(key: 'full_name', label: 'Full Name', type: FieldType.text, required: true, hint: 'Enter your full name', validators: [RjValidators.required(), RjValidators.minLength(2)]),
-    FieldMeta(key: 'email', label: 'Email Address', type: FieldType.text, required: true, hint: 'you@example.com', validators: [RjValidators.required(), RjValidators.email()]),
-    FieldMeta(
+    // Full Name + Email — side by side on tablet+
+    FieldMeta.text(key: 'full_name', label: 'Full Name', required: true, hint: 'Enter your full name', validators: [RjValidators.required(), RjValidators.minLength(2)], layout: const RjLayout(md: RjSpan.half)),
+    FieldMeta.text(key: 'email', label: 'Email Address', required: true, hint: 'you@example.com', validators: [RjValidators.required(), RjValidators.email()], layout: const RjLayout(md: RjSpan.half)),
+    FieldMeta.text(
       key: 'password',
       label: 'Password',
-      type: FieldType.text,
       required: true,
       obscureText: true,
       hint: 'Min 8 characters',
       validators: [RjValidators.required(), RjValidators.minLength(8), RjValidators.hasUppercase(), RjValidators.hasDigit()],
     ),
-    FieldMeta(key: 'bio', label: 'Bio', type: FieldType.textArea, hint: 'Tell us about yourself...', maxLines: 4, validators: [RjValidators.maxLength(500)]),
-    FieldMeta(key: 'age', label: 'Age', type: FieldType.number, required: true, hint: 'Enter your age', validators: [RjValidators.required(), RjValidators.between(1, 150)]),
-    FieldMeta(key: 'dob', label: 'Date of Birth', type: FieldType.date, required: true, firstDate: DateTime(1900), lastDate: DateTime.now(), hint: 'Select your date of birth'),
+    FieldMeta.textArea(key: 'bio', label: 'Bio', hint: 'Tell us about yourself...', maxLines: 4, validators: [RjValidators.maxLength(500)]),
+    // Age + DOB — side by side
+    FieldMeta.number(key: 'age', label: 'Age', required: true, hint: 'Enter your age', validators: [RjValidators.required(), RjValidators.between(1, 150)], layout: const RjLayout(md: RjSpan.half)),
+    FieldMeta.date(key: 'dob', label: 'Date of Birth', required: true, firstDate: DateTime(1900), lastDate: DateTime.now(), hint: 'Select your date of birth', layout: const RjLayout(md: RjSpan.half)),
     FieldMeta.section(key: 'sec_scheduling', label: 'Scheduling'),
-    FieldMeta(key: 'preferred_time', label: 'Preferred Meeting Time', type: FieldType.timePicker, required: true, hint: 'Select a time'),
+    FieldMeta.timePicker(key: 'preferred_time', label: 'Preferred Meeting Time', required: true, hint: 'Select a time'),
     FieldMeta.section(key: 'sec_preferences', label: 'Preferences'),
-    FieldMeta(
+    FieldMeta.dropdown(
       key: 'gender',
       label: 'Gender',
-      type: FieldType.dropdown,
       required: true,
       dropdownSource: DropdownSource.static([
         DropdownItem(id: 'male', label: 'Male'),
@@ -80,23 +80,26 @@ class _FormDemoPageState extends State<FormDemoPage> {
         DropdownItem(id: 'non_binary', label: 'Non-Binary'),
         DropdownItem(id: 'prefer_not', label: 'Prefer not to say'),
       ]),
+      layout: const RjLayout(md: RjSpan.half),
     ),
-    FieldMeta(key: 'country', label: 'Country', type: FieldType.dropdown, required: true, hint: 'Select your country', dropdownSource: DropdownSource.async(fetchCountries)),
-    FieldMeta(
+    // Country + City — side by side (city appears after country is selected)
+    FieldMeta.dropdown(key: 'country', label: 'Country', required: true, hint: 'Select your country', dropdownSource: DropdownSource.async(fetchCountries), layout: const RjLayout(md: RjSpan.half)),
+    FieldMeta.dropdown(
       key: 'city',
       label: 'City',
-      type: FieldType.dropdown,
       required: true,
       dependency: FieldDependency(dependsOn: 'country', condition: (val) => val != null),
       hint: 'Select your city',
       dropdownSource: DropdownSource.async(fetchCities),
+      layout: const RjLayout(md: RjSpan.half),
     ),
-    FieldMeta(key: 'newsletter', label: 'Subscribe to Newsletter', type: FieldType.toggle, hint: 'Get weekly updates and news'),
-    FieldMeta(key: 'accept_terms', label: 'Accept Terms & Conditions', type: FieldType.toggle, required: true, hint: 'You must accept to continue'),
-    FieldMeta(
+    // Toggles — each full width
+    FieldMeta.toggle(key: 'newsletter', label: 'Subscribe to Newsletter', hint: 'Get weekly updates and news'),
+    FieldMeta.toggle(key: 'accept_terms', label: 'Accept Terms & Conditions', required: true, hint: 'You must accept to continue'),
+    // Radio — full width (needs horizontal space for options)
+    FieldMeta.radio(
       key: 'experience_level',
       label: 'Experience Level',
-      type: FieldType.radio,
       required: true,
       options: [
         DropdownItem(id: 'beginner', label: 'Beginner', sublabel: 'Less than 1 year'),
@@ -105,10 +108,9 @@ class _FormDemoPageState extends State<FormDemoPage> {
         DropdownItem(id: 'expert', label: 'Expert', sublabel: '5+ years'),
       ],
     ),
-    FieldMeta(
+    FieldMeta.chip(
       key: 'skills',
       label: 'Skills',
-      type: FieldType.chip,
       required: true,
       hint: 'Select all that apply',
       options: [
@@ -121,23 +123,26 @@ class _FormDemoPageState extends State<FormDemoPage> {
         DropdownItem(id: 'sql', label: 'SQL'),
         DropdownItem(id: 'aws', label: 'AWS'),
       ],
+      layout: const RjLayout(md: RjSpan.half),
     ),
     FieldMeta.section(key: 'sec_ratings', label: 'Ratings & Quantities'),
-    FieldMeta(
+    FieldMeta.slider(
       key: 'satisfaction',
       label: 'Satisfaction Score',
-      type: FieldType.slider,
       required: true,
       sliderMin: 0,
       sliderMax: 100,
       sliderDivisions: 100,
       sliderLabelBuilder: (val) => '${val.round()}%',
+      layout: const RjLayout(md: RjSpan.half),
     ),
-    FieldMeta(key: 'volume', label: 'Volume Level', type: FieldType.slider, sliderMin: 0, sliderMax: 10, sliderDivisions: 10, sliderLabelBuilder: (val) => '${val.round()}'),
-    FieldMeta(key: 'quantity', label: 'Quantity', type: FieldType.spinner, required: true, spinnerMin: 1, spinnerMax: 99, spinnerStep: 1),
-    FieldMeta(key: 'years_experience', label: 'Years of Experience', type: FieldType.spinner, spinnerMin: 0, spinnerMax: 50, spinnerStep: 5),
+    // Volume + Quantity — side by side
+    FieldMeta.slider(key: 'volume', label: 'Volume Level', sliderMin: 0, sliderMax: 10, sliderDivisions: 10, sliderLabelBuilder: (val) => '${val.round()}', layout: const RjLayout(md: RjSpan.half)),
+    FieldMeta.spinner(key: 'quantity', label: 'Quantity', required: true, spinnerMin: 1, spinnerMax: 99, spinnerStep: 1, layout: const RjLayout(md: RjSpan.half)),
+    // Years Experience — half width, fills next to quantity in next row
+    FieldMeta.spinner(key: 'years_experience', label: 'Years of Experience', spinnerMin: 0, spinnerMax: 50, spinnerStep: 5, layout: const RjLayout(md: RjSpan.half)),
     FieldMeta.section(key: 'sec_media', label: 'Media & Custom'),
-    FieldMeta(key: 'profile_images', label: 'Profile Images', type: FieldType.image, maxImages: 5, hint: 'Upload up to 5 images'),
+    FieldMeta.image(key: 'profile_images', label: 'Profile Images', maxImages: 5, hint: 'Upload up to 5 images'),
     FieldMeta.custom(
       key: 'phone',
       label: 'Phone Number',

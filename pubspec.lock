@@ -291,10 +291,9 @@ packages:
   rj_form_engine:
     dependency: "direct main"
     description:
-      name: rj_form_engine
-      sha256: "6f4c0a97357878c9735828241d7c339ebdb90bd645d7eec61a73972b5cf6a711"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../rj_form_engine"
+      relative: true
+    source: path
     version: "0.3.0"
   sky_engine:
     dependency: transitive

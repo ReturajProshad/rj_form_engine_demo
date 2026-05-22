@@ -49,6 +49,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             const SizedBox(height: 48),
+            Text("Demo First"),
             RjForm(
               onSuccess: _handleLogin,
               theme: RjFormTheme(
@@ -58,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                     : AppTheme.lightBorder,
                 errorColor: AppTheme.errorColor,
                 borderRadius: BorderRadius.circular(AppTheme.borderRadius),
-                fieldSpacing: 20,
+                fieldSpacing: 10,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 16,
@@ -76,18 +77,18 @@ class _LoginPageState extends State<LoginPage> {
                 // submitButtonText: 'Sign In',
               ),
               fields: [
-                FieldMeta(
+                // Email + Password — side by side on tablet+
+                FieldMeta.text(
                   key: "email",
                   label: "Email Address",
-                  type: FieldType.text,
                   required: true,
                   hint: "Enter your email",
                   validators: [RjValidators.required(), RjValidators.email()],
+                  layout: const RjLayout(md: RjSpan.third),
                 ),
-                FieldMeta(
+                FieldMeta.text(
                   key: "password",
                   label: "Password",
-                  type: FieldType.text,
                   required: true,
                   obscureText: _obscurePassword,
                   hint: "Enter your password",
@@ -96,16 +97,126 @@ class _LoginPageState extends State<LoginPage> {
                     RjValidators.minLength(6),
                   ],
                   toggleObscure: true,
+                  layout: const RjLayout(md: RjSpan.third),
+                ),
+                FieldMeta.custom(
+                  key: "submitLogin",
+                  label: "label",
+                  showLabel: false,
+                  layout: RjLayout(lg: RjSpan.third),
+                  builder: (context, field, value, onChanged, errorText) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              padding: WidgetStatePropertyAll(
+                                EdgeInsets.all(20),
+                              ),
+                              backgroundColor: WidgetStatePropertyAll(
+                                Colors.indigo,
+                              ),
+                            ),
+                            onPressed: () {},
+                            child: Text(
+                              "Submit Button",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ],
-              onSubmit: (result) async {},
+              // onSubmit: (result) async {},
             ),
-            const SizedBox(height: 24),
-            Center(
-              child: TextButton(
-                onPressed: () {},
-                child: const Text('Forgot Password?'),
+            const SizedBox(height: 48),
+            Text("Demo Second"),
+            RjForm(
+              onSuccess: _handleLogin,
+              theme: RjFormTheme(
+                primaryColor: AppTheme.primaryColor,
+                borderColor: isDark
+                    ? AppTheme.darkBorder
+                    : AppTheme.lightBorder,
+                errorColor: AppTheme.errorColor,
+                borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                fieldSpacing: 10,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+                fieldFillColor: isDark
+                    ? AppTheme.darkFieldFill
+                    : AppTheme.lightFieldFill,
+                labelStyle: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? AppTheme.darkTextPrimary
+                      : AppTheme.lightTextPrimary,
+                ),
+                submitButtonColor: AppTheme.primaryColor,
+                // submitButtonText: 'Sign In',
               ),
+              fields: [
+                // Email + Password — side by side on tablet+
+                FieldMeta.text(
+                  key: "email",
+                  label: "Email Address",
+                  required: true,
+                  hint: "Enter your email",
+                  validators: [RjValidators.required(), RjValidators.email()],
+                  layout: const RjLayout(md: RjSpan.third),
+                ),
+                FieldMeta.text(
+                  key: "password",
+                  label: "Password",
+                  required: true,
+                  obscureText: _obscurePassword,
+                  hint: "Enter your password",
+                  validators: [
+                    RjValidators.required(),
+                    RjValidators.minLength(6),
+                  ],
+                  toggleObscure: true,
+                  layout: const RjLayout(md: RjSpan.third),
+                ),
+                FieldMeta.custom(
+                  key: "submitLogin",
+                  label: "label",
+                  showLabel: false,
+                  layout: RjLayout(lg: RjSpan.half),
+                  builder: (context, field, value, onChanged, errorText) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              padding: WidgetStatePropertyAll(
+                                EdgeInsets.all(20),
+                              ),
+                              backgroundColor: WidgetStatePropertyAll(
+                                Colors.indigo,
+                              ),
+                            ),
+                            onPressed: () {},
+                            child: Text(
+                              "Submit Button",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+              // onSubmit: (result) async {},
             ),
           ],
         ),

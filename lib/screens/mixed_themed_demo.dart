@@ -37,9 +37,11 @@ class _MixedThemedDemoState extends State<MixedThemedDemo> {
 
   List<FieldMeta> get fields => [
     FieldMeta.section(key: 'sec_profile', label: 'Profile Setup'),
+    // Profile photo — half width, sits next to Full Name
     FieldMeta.custom(
       key: 'profile_image',
       label: 'Profile Photo',
+      layout: const RjLayout(md: RjSpan.half),
       builder: (context, field, value, onChanged, errorText) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -128,36 +130,38 @@ class _MixedThemedDemoState extends State<MixedThemedDemo> {
         );
       },
     ),
-    FieldMeta(
+    FieldMeta.text(
       key: 'full_name',
       label: 'Full Name',
-      type: FieldType.text,
       required: true,
       hint: 'Enter your full name',
       validators: [RjValidators.required(), RjValidators.minLength(2)],
+      layout: const RjLayout(md: RjSpan.half),
     ),
-    FieldMeta(
+    // Email — full width below profile photo + name row
+    FieldMeta.text(
       key: 'email',
       label: 'Email Address',
-      type: FieldType.text,
       required: true,
       hint: 'you@example.com',
       validators: [RjValidators.required(), RjValidators.email()],
     ),
     FieldMeta.section(key: 'sec_details', label: 'Details'),
-    FieldMeta(
+    // Country + Phone — side by side on tablet+
+    FieldMeta.dropdown(
       key: 'country',
       label: 'Country',
-      type: FieldType.dropdown,
       required: true,
       hint: 'Select your country',
       dropdownSource: DropdownSource.async(fetchCountries),
+      layout: const RjLayout(md: RjSpan.half),
     ),
     FieldMeta.custom(
       key: 'phone',
       label: 'Phone Number',
       required: true,
       validators: [PhoneValidators.byCountry()],
+      layout: const RjLayout(md: RjSpan.half),
       builder: (context, field, value, onChanged, errorText) {
         final phone =
             value as PhoneNumber? ??
@@ -310,10 +314,9 @@ class _MixedThemedDemoState extends State<MixedThemedDemo> {
       },
     ),
     FieldMeta.section(key: 'sec_preferences', label: 'Preferences'),
-    FieldMeta(
+    FieldMeta.toggle(
       key: 'newsletter',
       label: 'Enable Notifications',
-      type: FieldType.toggle,
       hint: 'Receive push notifications',
     ),
     FieldMeta.custom(
@@ -375,10 +378,9 @@ class _MixedThemedDemoState extends State<MixedThemedDemo> {
         );
       },
     ),
-    FieldMeta(
+    FieldMeta.slider(
       key: 'satisfaction',
       label: 'Satisfaction Score',
-      type: FieldType.slider,
       required: true,
       sliderMin: 0,
       sliderMax: 100,

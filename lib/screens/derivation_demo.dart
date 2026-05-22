@@ -27,17 +27,17 @@ class _DerivationDemoState extends State<DerivationDemo> {
 
   List<FieldMeta> get fields => [
         FieldMeta.section(key: 'sec_simple', label: 'Simple Derivation'),
-        FieldMeta(
+        // Input + derived output — side by side
+        FieldMeta.number(
           key: 'default_value',
           label: 'Default Value',
-          type: FieldType.number,
           required: true,
           hint: 'Enter a number',
+          layout: const RjLayout(md: RjSpan.half),
         ),
-        FieldMeta(
+        FieldMeta.number(
           key: 'derived_from_default',
           label: 'Doubled (auto)',
-          type: FieldType.number,
           derivation: FieldDerivation(
             derivesFrom: ['default_value'],
             compute: (state) {
@@ -45,29 +45,31 @@ class _DerivationDemoState extends State<DerivationDemo> {
               return val != null ? val * 2 : null;
             },
           ),
+          layout: const RjLayout(md: RjSpan.half),
         ),
         FieldMeta.section(
           key: 'sec_multi',
           label: 'Multi-Source Derivation',
         ),
-        FieldMeta(
+        // Price + Quantity — side by side
+        FieldMeta.number(
           key: 'price',
           label: 'Price',
-          type: FieldType.number,
           required: true,
           hint: 'Enter price',
+          layout: const RjLayout(md: RjSpan.half),
         ),
-        FieldMeta(
+        FieldMeta.number(
           key: 'quantity',
           label: 'Quantity',
-          type: FieldType.number,
           required: true,
           hint: 'Enter quantity',
+          layout: const RjLayout(md: RjSpan.half),
         ),
-        FieldMeta(
+        // Total — full width (derived field)
+        FieldMeta.number(
           key: 'total',
           label: 'Total (auto)',
-          type: FieldType.number,
           derivation: FieldDerivation(
             derivesFrom: ['price', 'quantity'],
             compute: (state) {
@@ -81,21 +83,21 @@ class _DerivationDemoState extends State<DerivationDemo> {
           key: 'sec_label_shadow',
           label: 'Label Shadowing (Dropdown)',
         ),
-        FieldMeta(
+        // Category + Item — side by side
+        FieldMeta.dropdown(
           key: 'category',
           label: 'Category',
-          type: FieldType.dropdown,
           required: true,
           dropdownSource: DropdownSource.static([
             DropdownItem(id: 'fruit', label: 'Fruit'),
             DropdownItem(id: 'dairy', label: 'Dairy'),
             DropdownItem(id: 'meat', label: 'Meat'),
           ]),
+          layout: const RjLayout(md: RjSpan.half),
         ),
-        FieldMeta(
+        FieldMeta.dropdown(
           key: 'item',
           label: 'Item',
-          type: FieldType.dropdown,
           required: true,
           dependency: FieldDependency(
             dependsOn: 'category',
@@ -126,11 +128,12 @@ class _DerivationDemoState extends State<DerivationDemo> {
                 return [];
             }
           }),
+          layout: const RjLayout(md: RjSpan.half),
         ),
-        FieldMeta(
+        // Auto Tag — full width (derived output)
+        FieldMeta.text(
           key: 'derived_tag',
           label: 'Auto Tag (auto)',
-          type: FieldType.text,
           derivation: FieldDerivation(
             derivesFrom: ['category', 'item'],
             compute: (state) {
@@ -147,17 +150,17 @@ class _DerivationDemoState extends State<DerivationDemo> {
           key: 'sec_label_custom',
           label: 'Label Customization',
         ),
-        FieldMeta(
+        // Hidden label + Styled label — side by side
+        FieldMeta.text(
           key: 'hidden_label_field',
           label: 'This label is hidden',
-          type: FieldType.text,
           hint: 'No label shown above — only this hint',
           showLabel: false,
+          layout: const RjLayout(md: RjSpan.half),
         ),
-        FieldMeta(
+        FieldMeta.text(
           key: 'styled_label_field',
           label: 'Default label (not shown)',
-          type: FieldType.text,
           hint: 'Custom label above with styling',
           showLabel: true,
           labelConfig: const RjLabelText(
@@ -169,11 +172,12 @@ class _DerivationDemoState extends State<DerivationDemo> {
               letterSpacing: 1.2,
             ),
           ),
+          layout: const RjLayout(md: RjSpan.half),
         ),
-        FieldMeta(
+        // Custom widget label — full width
+        FieldMeta.number(
           key: 'custom_widget_label',
           label: 'Default label (not shown)',
-          type: FieldType.number,
           hint: 'Enter a value',
           showLabel: true,
           labelConfig: RjLabelCustom((context) {
