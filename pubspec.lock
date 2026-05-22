@@ -291,10 +291,11 @@ packages:
   rj_form_engine:
     dependency: "direct main"
     description:
-      path: "../rj_form_engine"
-      relative: true
-    source: path
-    version: "0.3.0"
+      name: rj_form_engine
+      sha256: "84535b316cd2572ad085b03becac64b515083fc25fbc6d9fda61da5f7c907e6f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   sky_engine:
     dependency: transitive
     description: flutter
