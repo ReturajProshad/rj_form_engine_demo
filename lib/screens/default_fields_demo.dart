@@ -102,9 +102,18 @@ class _DefaultFieldsDemoState extends State<DefaultFieldsDemo> {
       hint: 'Select a time',
       layout: const RjLayout(md: RjSpan.half),
     ),
-    FieldMeta.dropdown(
+    FieldMeta.searchableDropdown(
       key: 'country',
       label: 'Country',
+      required: true,
+      hint: 'Select your country',
+      dropdownSource: DropdownSource.async(fetchCountries),
+      layout: const RjLayout(md: RjSpan.half),
+      config: SearchableDropdownConfig(offsetY: 0),
+    ),
+    FieldMeta.dropdown(
+      key: 'countryNormal',
+      label: 'Country No search',
       required: true,
       hint: 'Select your country',
       dropdownSource: DropdownSource.async(fetchCountries),
