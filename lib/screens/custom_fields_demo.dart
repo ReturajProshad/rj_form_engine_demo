@@ -671,6 +671,15 @@ class _CustomFieldsDemoState extends State<CustomFieldsDemo> {
         );
       },
     ),
+    FieldMeta.section(key: "perosnal_test_key", label: "personal Test"),
+    FieldMeta.custom(
+      key: "personal",
+      label: "custom Flat",
+
+      builder: (context, field, value, onChanged, errorText) {
+        return Row(children: [Text("data"), Spacer(), Text(field.key)]);
+      },
+    ),
   ];
 
   Future<void> _handleSubmit(FormResult result) async {

@@ -4,6 +4,7 @@ import 'package:rj_form_engine_tests_project/screens/custom_fields_demo.dart';
 import 'package:rj_form_engine_tests_project/screens/derivation_demo.dart';
 import 'package:rj_form_engine_tests_project/screens/login_page.dart';
 import 'package:rj_form_engine_tests_project/screens/mixed_themed_demo.dart';
+import 'package:rj_form_engine_tests_project/screens/repeatable_group_demo.dart';
 import 'package:rj_form_engine_tests_project/theme/app_theme.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -117,6 +118,19 @@ class HomeScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) => const DerivationDemo(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _DemoCard(
+                      icon: Icons.repeat_rounded,
+                      title: 'Repeatable Group',
+                      subtitle: 'Dynamic line items with row derivations',
+                      color: AppTheme.accentColor,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const RepeatableGroupDemo(),
                         ),
                       ),
                     ),
